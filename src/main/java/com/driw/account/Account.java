@@ -8,8 +8,7 @@ import org.hibernate.annotations.NaturalId;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -22,6 +21,11 @@ public class Account extends BaseEntity implements Serializable {
 
     //public static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
+    @Id
+    @Column(name = "account_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     @NaturalId
     private String username;
 
@@ -31,6 +35,7 @@ public class Account extends BaseEntity implements Serializable {
     private String[] roles;
 
     @OneToMany
+    @JoinColumn(name="account_fk")
     List<Order> orderList;
 
     public void setPassword(String password) {
@@ -57,5 +62,14 @@ public class Account extends BaseEntity implements Serializable {
 
     public String getPassword() {
         return password;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    protected void setId(Long id) {
+        this.id = id;
     }
 }

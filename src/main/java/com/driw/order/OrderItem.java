@@ -11,12 +11,17 @@ import java.io.Serializable;
 public class OrderItem extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    @Id
+    @Column(name = "order_item_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @ManyToOne
+    @JoinColumn(name="order_fk")
     private Order order;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="PRODUCT_ID")
+    @OneToOne
+    @JoinColumn(name="product_fk")
     private Product product;
 
     private int count;
@@ -47,5 +52,14 @@ public class OrderItem extends BaseEntity implements Serializable {
 
     public void setTotal(double total) {
         this.total = total;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    protected void setId(Long id) {
+        this.id = id;
     }
 }
