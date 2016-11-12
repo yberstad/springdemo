@@ -20,9 +20,13 @@ public class OrderItem extends BaseEntity implements Serializable {
     @JoinColumn(name="order_fk")
     private Order order;
 
-    @OneToOne
-    @JoinColumn(name="product_fk")
-    private Product product;
+//    @OneToOne
+//    @JoinColumn(name="product_fk")
+//    private Product product;
+
+    private String productNumber;
+
+    private String productName;
 
     private int count;
 
@@ -34,13 +38,20 @@ public class OrderItem extends BaseEntity implements Serializable {
 
     public OrderItem(Order order, Product product, int count) {
         this.order = order;
-        this.product = product;
         this.count = count;
+        this.productNumber = product.getNumber();
+        this.productName = product.getName();
+
+        // Calculate the total cost based on current discount.
+        double productPrice = (count >= product.getDiscountThresholdValue()) ?
+                product.getDiscountedPrice() :
+                product.getPrice();
+        total = productPrice * count;
     }
 
-    public Product getProduct() {
-        return product;
-    }
+    public String getProductNumber() { return productNumber; }
+
+    public String getProductName() { return productName; }
 
     public int getCount() {
         return count;
@@ -48,10 +59,6 @@ public class OrderItem extends BaseEntity implements Serializable {
 
     public double getTotal() {
         return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
     }
 
     public Long getId() {
@@ -62,4 +69,5 @@ public class OrderItem extends BaseEntity implements Serializable {
     protected void setId(Long id) {
         this.id = id;
     }
+
 }

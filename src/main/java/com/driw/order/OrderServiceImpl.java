@@ -1,11 +1,11 @@
 package com.driw.order;
 
-import com.driw.product.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
-import java.util.Collection;
+import java.util.List;
 
 @Component("orderService")
 @Transactional
@@ -22,7 +22,7 @@ class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Collection<Order> findByAccountUserName(String username) {
+    public List<Order> findByAccountUserName(String username) {
         return this.orderRepository.findByAccountUsername(username);
     }
 
@@ -32,8 +32,8 @@ class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderItem addOrderItem(Order order, Product product, int count) {
-        OrderItem orderItem = new OrderItem(order, product, count);
+    public OrderItem addOrderItem(OrderItem orderItem) {
+        Assert.notNull(orderItem, "Hotel OrderItem not be null");
         return this.orderItemRepository.save(orderItem);
     }
 }

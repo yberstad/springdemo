@@ -6,6 +6,7 @@ import com.driw.base.BaseEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity(name="orders")
@@ -29,10 +30,11 @@ public class Order extends BaseEntity implements Serializable {
     private Double total;
 
     public Order() {
-
+        this.orderItemList = new ArrayList();
     }
 
     public Order(Account account) {
+        this.orderItemList = new ArrayList();
         this.account = account;
     }
 

@@ -10,7 +10,9 @@ import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @ToString(excludes = "password")
@@ -32,7 +34,10 @@ public class Account extends BaseEntity implements Serializable {
     @JsonIgnore
     private String password;
 
-    private String[] roles;
+    @ElementCollection
+    @CollectionTable(joinColumns = @JoinColumn(name="account_fk"))
+    protected Set<String> roles = new HashSet();
+
 
     @OneToMany
     @JoinColumn(name="account_fk")
@@ -47,16 +52,17 @@ public class Account extends BaseEntity implements Serializable {
 
     }
 
-    public Account(String username, String password, String... roles) {
+    public Account(String username, String password, Set<String> roles) {
         this.username = username;
         this.password = password;
+        this.roles = roles;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public String[] getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 

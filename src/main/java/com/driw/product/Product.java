@@ -15,6 +15,8 @@ public class Product extends BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(nullable = false)
+    private String number;
 
     @Column(nullable = false)
     private String name;
@@ -23,18 +25,22 @@ public class Product extends BaseEntity implements Serializable {
 
     private int discountPercentage;
 
-    private int discountCountThreshold;
+    private int discountThresholdValue;
 
     protected Product() {
     }
 
-    public Product(String name, Double price, int discountPercentage, int discountCountThreshold){
+    public Product(String number, String name, Double price, int discountPercentage, int discountThresholdValue){
+        this.number = number;
         this.name = name;
         this.price = price;
         this.discountPercentage = discountPercentage;
-        this.discountCountThreshold = discountCountThreshold;
+        this.discountThresholdValue = discountThresholdValue;
     }
 
+    public String getNumber() {
+        return number;
+    }
     public String getName() {
         return name;
     }
@@ -43,12 +49,16 @@ public class Product extends BaseEntity implements Serializable {
         return price;
     }
 
+    public Double getDiscountedPrice() {
+        return price * ((100 - discountPercentage)/100.0);
+    }
+
     public int getDiscountPercentage() {
         return discountPercentage;
     }
 
-    public int getDiscountCountThreshold() {
-        return discountCountThreshold;
+    public int getDiscountThresholdValue() {
+        return discountThresholdValue;
     }
 
     public Long getId() {
@@ -59,4 +69,5 @@ public class Product extends BaseEntity implements Serializable {
     protected void setId(Long id) {
         this.id = id;
     }
+
 }

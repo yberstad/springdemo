@@ -2,16 +2,17 @@ package com.driw.order;
 
 import com.driw.product.Product;
 
-import java.util.Collection;
+import java.util.List;
 
 
 public interface OrderService {
 
-    // Collection -> unordered list...
-    Collection<Order> findByAccountUserName(String username);
+    // Collection -> unordered list.
+    // List -> order list.
+    List<Order> findByAccountUserName(String username);
 
     Order addOrder(Order order);
 
-    OrderItem addOrderItem(Order order, Product product, int count);
+    OrderItem addOrderItem(OrderItem orderItem);
 
 }
