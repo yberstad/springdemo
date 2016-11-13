@@ -24,4 +24,9 @@ class ProductServiceImpl implements ProductService {
     public Product getProduct(String name) {
         return this.productRepository.findByName(name);
     }
+
+    @Override
+    public Product getProduct(Long id) {
+        return this.productRepository.findById(id);
+    }
 }

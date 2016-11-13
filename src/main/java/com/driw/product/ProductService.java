@@ -6,4 +6,5 @@ package com.driw.product;
 public interface ProductService {
     Product save (Product product);
     Product getProduct(String name);
+    Product getProduct(Long id);
 }

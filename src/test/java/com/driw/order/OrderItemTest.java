@@ -16,8 +16,8 @@ public class OrderItemTest {
     @Test
     public void constructor_WhenCountIsAboveDiscountThreshold_ShouldSetDiscountPrice() throws Exception {
         Order order = new Order();
-        String productNumber = "productNumber";
-        String productName = "productName";
+        String productNumber = "productNumber1";
+        String productName = "productName1";
         Double productPrice = 100.0;
         int discountPercentage = 10;
         int discountThreshold = 5;

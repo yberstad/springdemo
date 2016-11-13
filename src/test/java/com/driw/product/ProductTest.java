@@ -16,11 +16,10 @@ public class ProductTest {
     }
 
     private Product getStubProduct(Double productPrice, int discountPercentage) {
-        String productNumber = "ABCD123";
-        String productName = "product";
+        String productNumber = "productNumber1";
+        String productName = "productName1";
         int discountThresholdValue = 100;
-        Product product = new Product(productNumber, productName, productPrice, discountPercentage, discountThresholdValue);
-        return product;
+        return new Product(productNumber, productName, productPrice, discountPercentage, discountThresholdValue);
     }
 
     @Test

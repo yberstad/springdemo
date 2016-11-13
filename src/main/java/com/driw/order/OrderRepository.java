@@ -6,4 +6,5 @@ import java.util.List;
 
 interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByAccountUsername(String username);
+    Order findById(Long id);
 }

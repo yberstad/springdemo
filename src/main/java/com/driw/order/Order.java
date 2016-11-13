@@ -23,11 +23,9 @@ public class Order extends BaseEntity implements Serializable {
     @JoinColumn(name="account_fk")
     private Account account;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name="order_fk")
     private List<OrderItem> orderItemList;
-
-    private Double total;
 
     public Order() {
         this.orderItemList = new ArrayList();
@@ -47,6 +45,10 @@ public class Order extends BaseEntity implements Serializable {
     }
 
     public Double getTotal() {
+        Double total = 0.0;
+        for (OrderItem item: orderItemList ) {
+            total += item.getTotal();
+        }
         return total;
     }
 

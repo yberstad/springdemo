@@ -11,6 +11,8 @@ public interface OrderService {
     // List -> order list.
     List<Order> findByAccountUserName(String username);
 
+    Order getOrder(Long id);
+
     Order addOrder(Order order);
 
     OrderItem addOrderItem(OrderItem orderItem);
