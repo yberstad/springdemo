@@ -1,26 +1,28 @@
 package com.driw.web.order;
 
-import com.driw.Application;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.embedded.EmbeddedWebApplicationContext;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.mock.http.MockHttpOutputMessage;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.Filter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.testSecurityContext;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -47,6 +49,9 @@ public class OrderRestControllerIntegrationTest {
     @Autowired
     WebApplicationContext webApplicationContext;
 
+    @Autowired
+    private Filter springSecurityFilterChain;
+
     private MockMvc mockMvc;
 
     @Autowired
@@ -60,22 +65,28 @@ public class OrderRestControllerIntegrationTest {
 
     @Before
     public void setUp(){
-        mockMvc = webAppContextSetup(webApplicationContext).build();
+
+        mockMvc = webAppContextSetup(webApplicationContext)
+                .addFilters(springSecurityFilterChain)
+                .defaultRequest(get("/").with(testSecurityContext())).build();
     }
 
     @Test
+    @WithMockUser("account_with_orders")
     public void createOrder_WithExistingAccount_ShouldReturnStatusCreated() throws Exception{
-        mockMvc.perform(post("/api/account_with_orders/orders"))
+        mockMvc.perform(post("/api/orders"))
                 .andExpect(status().isCreated());
     }
 
     @Test
+    @WithMockUser("account_not")
     public void createOrder_WithExistingAccount_ShouldReturnStatusNotFound() throws Exception{
-        mockMvc.perform(post("/api/account_not/orders"))
+        mockMvc.perform(post("/api/orders"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
+    @WithMockUser("account_with_orders")
     public void addOrderItem_WithValidRequestBodyGiven_ShouldReturnStatusCreated() throws Exception{
         OrderItemRequestModel requestBody = new OrderItemRequestModel();
         requestBody.orderId = 1L;
@@ -83,13 +94,14 @@ public class OrderRestControllerIntegrationTest {
         requestBody.count = 20;
 
         String content = this.json(requestBody);
-        mockMvc.perform(post("/api/account_with_orders/orders/additem")
+        mockMvc.perform(post("/api/orders/additem")
                 .contentType(contentType)
                 .content(content))
                 .andExpect(status().isCreated());
     }
 
     @Test
+    @WithMockUser("account_with_orders")
     public void addOrderItem_WithValidRequestBodyGiven_ShouldReturnStatusNotFound() throws Exception{
         OrderItemRequestModel requestBody = new OrderItemRequestModel();
         requestBody.orderId = 10L;
@@ -97,7 +109,7 @@ public class OrderRestControllerIntegrationTest {
         requestBody.count = 20;
 
         String content = this.json(requestBody);
-        mockMvc.perform(post("/api/account_with_orders/orders/additem")
+        mockMvc.perform(post("/api/orders/additem")
                 .contentType(contentType)
                 .content(content))
                 .andExpect(status().isNotFound());

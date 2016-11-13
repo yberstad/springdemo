@@ -1,11 +1,12 @@
 
 /*ACCOUNT*/
+SET @password1_as_encrypted = '$2a$10$A6Ap1RLH.opLUHhwxiR/QuaABCmJsO.B176szn.MBMumBKPspKswq';
 SET @account_with_orders_id = 2;
-INSERT INTO account(account_id, username, password ) VALUES (@account_with_orders_id, "account_with_orders", "password1");
+INSERT INTO account(account_id, username, password ) VALUES (@account_with_orders_id, "account_with_orders", @password1_as_encrypted);
 INSERT INTO account_roles (account_fk, roles) VALUES (@account_with_orders_id, "ROLE_ADMIN");
 
 SET @account_without_orders_id = 3;
-INSERT INTO account(account_id, username, password ) VALUES (@account_without_orders_id, "account_without_orders", "password1");
+INSERT INTO account(account_id, username, password ) VALUES (@account_without_orders_id, "account_without_orders", @password1_as_encrypted);
 INSERT INTO account_roles (account_fk, roles) VALUES (@account_without_orders_id, "ROLE_ADMIN");
 
 /*PRODUCT*/

@@ -8,27 +8,35 @@ import com.driw.order.OrderService;
 import com.driw.product.Product;
 import com.driw.product.ProductService;
 import com.driw.utils.SetIdHelper;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.context.WebApplicationContext;
 
+import javax.servlet.Filter;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.testSecurityContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(OrderRestController.class)
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.MOCK)
+@WebAppConfiguration
 public class OrderRestControllerTest {
 
-    private String accountName = "account1";
+    private String accountName = "account_with_orders";
 
 
     private Account getStubAccount() {
@@ -69,6 +77,11 @@ public class OrderRestControllerTest {
     }
 
     @Autowired
+    WebApplicationContext webApplicationContext;
+
+    @Autowired
+    private Filter springSecurityFilterChain;
+
     private MockMvc mockMvc;
 
     @MockBean
@@ -80,13 +93,23 @@ public class OrderRestControllerTest {
     @MockBean
     private ProductService productService;
 
+    @Before
+    public void setUp(){
+
+        mockMvc = webAppContextSetup(webApplicationContext)
+                .addFilters(springSecurityFilterChain)
+                .defaultRequest(get("/").with(testSecurityContext()))
+                .build();
+    }
+
     @Test
+    @WithMockUser("account_with_orders")
     public void apiOrders_AccountWithOrdersGiven_ShouldReturnOrders() throws Exception {
         Optional<Account> findByUserNameReturnValue = Optional.of(getStubAccount());
         when(this.accountService.findByUsername(accountName)).thenReturn(findByUserNameReturnValue);
         when(this.orderService.findByAccountUserName(accountName)).thenReturn(getStubOrderList());
 
-        this.mockMvc.perform(get(String.format("/api/%1$s/orders", accountName)).accept(MediaType.APPLICATION_JSON))
+        this.mockMvc.perform(get("/api/orders").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("[0].orderItemList[1].productNumber").value("ABC124"));
 

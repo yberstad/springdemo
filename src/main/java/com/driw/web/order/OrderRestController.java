@@ -3,6 +3,7 @@ package com.driw.web.order;
 import com.driw.account.Account;
 import com.driw.account.AccountService;
 import com.driw.exceptions.NotFoundException;
+import com.driw.exceptions.UserNotFoundException;
 import com.driw.order.Order;
 import com.driw.order.OrderItem;
 import com.driw.order.OrderService;
@@ -15,11 +16,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "/api/{username}/orders", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/orders", produces = MediaType.APPLICATION_JSON_VALUE)
 class OrderRestController {
 
     private OrderService orderService;
@@ -36,15 +38,15 @@ class OrderRestController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    List<Order> retrieveOrders(@PathVariable String username){
-        this.validateUser(username);
-        return this.orderService.findByAccountUserName(username);
+    List<Order> retrieveOrders(Principal principal){
+        this.validateUser(principal);
+        return this.orderService.findByAccountUserName(principal.getName());
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    ResponseEntity<?> createOrder(@PathVariable String username){
-        this.validateUser(username);
-        Optional<Account> account = this.accountService.findByUsername(username);
+    ResponseEntity<?> createOrder(Principal principal){
+        this.validateUser(principal);
+        Optional<Account> account = this.accountService.findByUsername(principal.getName());
         Order order = this.orderService.addOrder(new Order(account.get()));
 
         URI location = ServletUriComponentsBuilder
@@ -55,12 +57,12 @@ class OrderRestController {
     }
 
     @RequestMapping(value="additem", method = RequestMethod.POST)
-    ResponseEntity<?> addOrderItem(@PathVariable String username,
+    ResponseEntity<?> addOrderItem(Principal principal,
                                    @RequestBody OrderItemRequestModel itemModel){
-        this.validateUser(username);
+        this.validateUser(principal);
 
         Order order = this.orderService.getOrder(itemModel.orderId);
-        if(order == null || !order.getAccount().getUsername().equals(username)) {
+        if(order == null || !order.getAccount().getUsername().equals(principal.getName())) {
             throw new NotFoundException("Order could not be found");
         }
 
@@ -79,11 +81,11 @@ class OrderRestController {
         return ResponseEntity.created(location).build();
     }
 
-    private void validateUser(String username) {
+    private void validateUser(Principal principal) {
+        String userId = principal.getName();
         this.accountService
-                .findByUsername(username)
+                .findByUsername(userId)
                 .orElseThrow(
-                    () -> new NotFoundException(String.format("Could not find user '%1$s''.", username))
-                );
+                        () -> new UserNotFoundException(userId));
     }
 }

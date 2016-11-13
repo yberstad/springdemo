@@ -5,6 +5,8 @@ import com.driw.order.Order;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import groovy.transform.ToString;
 import org.hibernate.annotations.NaturalId;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 //import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -21,7 +23,7 @@ public class Account extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    //public static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
+    public static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     @Id
     @Column(name = "account_id", nullable = false)
@@ -34,7 +36,7 @@ public class Account extends BaseEntity implements Serializable {
     @JsonIgnore
     private String password;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(joinColumns = @JoinColumn(name="account_fk"))
     protected Set<String> roles = new HashSet();
 
@@ -44,8 +46,7 @@ public class Account extends BaseEntity implements Serializable {
     List<Order> orderList;
 
     public void setPassword(String password) {
-
-        this.password = password;//PASSWORD_ENCODER.encode(password);
+        this.password = PASSWORD_ENCODER.encode(password);
     }
 
     public Account(){
@@ -54,8 +55,8 @@ public class Account extends BaseEntity implements Serializable {
 
     public Account(String username, String password, Set<String> roles) {
         this.username = username;
-        this.password = password;
         this.roles = roles;
+        this.setPassword(password);
     }
 
     public String getUsername() {
@@ -64,6 +65,10 @@ public class Account extends BaseEntity implements Serializable {
 
     public Set<String> getRoles() {
         return roles;
+    }
+
+    public String[] getRoleAsArray(){
+        return roles.toArray(new String[roles.size()]);
     }
 
     public String getPassword() {
