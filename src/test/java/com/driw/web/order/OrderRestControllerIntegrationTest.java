@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.embedded.EmbeddedWebApplicationContext;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -24,11 +25,19 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+// SpringRunner is an alias for the SpringJUnit4ClassRunner.(requires JUnit 4.12 or higher)
+// @SpringBootTest is a simplification of @SpringApplicationConfiguration, @ContextConfiguration, @IntegrationTest etc..
+
+// Two configurations:
+// 1. WebEnvironment.MOCK and @WebAppConfiguration class annotation + WebApplicationContext
+// 2. WebEnvironment.RANDOM_PORT, no @WebAppConfiguration and EmbeddedWebApplicationContext
+
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.MOCK)
 @WebAppConfiguration
 public class OrderRestControllerIntegrationTest {
+
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
             MediaType.APPLICATION_JSON.getSubtype(),
             Charset.forName("utf8"));
